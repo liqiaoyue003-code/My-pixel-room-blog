@@ -98,7 +98,7 @@ function HomePage() {
             opacity: hovered ? 1 : 0.62,
           }}
         >
-          click to enter
+          click to entr
         </p>
       </button>
     </div>
