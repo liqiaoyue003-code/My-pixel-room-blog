@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // Asset imports
 import roomBg from "@/imports/image.png";
@@ -24,6 +24,7 @@ import BookshelfPage from "@/app/pages/BookshelfPage";
 import MoonPage from "@/app/pages/MoonPage";
 import ProjectDetailPage from "@/app/pages/ProjectDetailPage";
 import CourseDetailPage from "@/app/pages/CourseDetailPage";
+import PixelLoading from "@/app/components/PixelLoading";
 
 const CANVAS_W = 1280;
 const CANVAS_H = 880;
@@ -98,7 +99,7 @@ function HomePage() {
             opacity: hovered ? 1 : 0.62,
           }}
         >
-          click to entr
+          click to enter
         </p>
       </button>
     </div>
@@ -110,9 +111,32 @@ function HomePage() {
 function RoomPage() {
   const navigate = useNavigate();
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [ready, setReady] = useState(false);
+
+  // 模拟加载：等待背景图加载完成
+  useEffect(() => {
+    const img = new Image();
+    img.src = roomBg;
+    img.onload = () => setReady(true);
+    img.onerror = () => setReady(true); // 加载失败也显示，避免卡死
+    // 兜底：如果 onload 不触发，1.5 秒后强制显示
+    const t = setTimeout(() => setReady(true), 1500);
+    return () => clearTimeout(t);
+  }, []);
 
   // 容器宽高比锁定为原图 1280:880，自适应撑满视口但不超出
   const aspect = CANVAS_W / CANVAS_H; // ≈ 1.4545
+
+  if (!ready) {
+    return (
+      <div
+        className="fixed inset-0 flex items-center justify-center overflow-hidden"
+        style={{ background: "#c8d8e8" }}
+      >
+        <PixelLoading />
+      </div>
+    );
+  }
 
   return (
     <div
